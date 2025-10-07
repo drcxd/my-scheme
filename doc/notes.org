@@ -1,0 +1,51 @@
+* Scanning
+
+Apparently, I cannot implement exactly as the standard or even the
+Chez user guide described. I am going to implement a simplified
+version of the language.
+
+The current lexer uses delimiters to partition source code. Some
+delimiters have their corresponding token types, some not. The part
+surrounded by delimiters will be further classified according to its
+content.
+
+Currently, we only support =#t= and =#f= as the boolean values. Only
+decimal numbers are supported. Scientific notation is not supported
+yet. Anything else is treated as symbols. Unicode is not supported
+yet. Using ~|~ to mark identifiers are also not supported.
+
+Though the scanner is rudimentary, it should support writing most
+educational programs now.
+
+** Identifiers
+
+Scheme is very different from C for it is permissive for
+identifiers. In C, only alphabets, digits and underscore are allowed
+in an identifier and it cannot begin with a digit. In Scheme, an
+identifier can consists of letters, digits and the "extended
+identifier characters":
+
+#+begin_example
+! $ % & * + - . / : < = > ? @ ^ _ ~
+#+end_example
+
+One thing worth noting is that in R7RS 2.1:
+
+#+begin_quote
+An identifieris any sequence of letters, digits, and “extended
+identifier characters” provided that it does not have a prefix which
+is a valid number.
+#+end_quote
+
+However, I found that both Racket and Chez allow identifiers such as
+~256ls~. This seems contradicts with the standard, doesn't it?
+
+I found an explanation for this difference in section 1.1 in this
+[[https://cisco.github.io/ChezScheme/csug9.6/intro.html][documentation]]:
+
+#+begin_quote
+Chez Scheme extends the syntax of identifiers in several ways. First,
+the sequence of characters making up an identifier's name may start
+with digits, periods, plus signs, and minus signs as long as the
+sequence cannot be parsed as a number.
+#+end_quote

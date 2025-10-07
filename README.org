@@ -1,3 +1,5 @@
 This is my personal implementation of a Scheme interpreter.
 
-I implement this with the help of large language models (LLMs).
+I implement this with the help of large language models (LLMs). I use
+them for advice, clarifying ideas and searching information. I do not
+use them to generate any code.
