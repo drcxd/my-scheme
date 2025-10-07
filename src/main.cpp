@@ -1,7 +1,9 @@
+#include <filesystem>
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <filesystem>
+
+#include "Lexer.hh"
 
 using namespace std;
 
@@ -15,14 +17,20 @@ void runPrompt() {
 }
 
 int runFile(std::string_view file) {
-  std::ifstream fs{file.data()};
+  std::ifstream fs{file.data(), std::ios_base::binary};
   if (fs.good()) {
     auto size = std::filesystem::file_size(file);
     std::string buffer(size, 0);
     fs.read(buffer.data(), size);
-    std::cout << buffer;
+
+    Lexer lexer{buffer};
+    auto tokens = lexer.getAllTokens();
+    for (auto& token : tokens) {
+      std::cout << toString(token) << std::endl;
+    }
     return 0;
   }
+  std::cerr << "Bad input file " << file << std::endl;
   return -1;
 }
 
