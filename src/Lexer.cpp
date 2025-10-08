@@ -44,27 +44,26 @@ static auto isBoolean(std::string_view lexeme) -> bool {
 };
 
 static auto isNumber(std::string_view lexeme) -> bool {
-  bool isNumber = true;
-  if (lexeme.length() > 0) {
+  bool isNumber = lexeme.length() > 0;
+  if (isNumber) {
     std::string_view n = lexeme;
     if (lexeme[0] == '+' || lexeme[0] == '-') {
       n = lexeme.substr(1);
     }
-    int dotCount = 0;
-    for (auto c : n) {
-      if (!isDigit(c)) {
-        isNumber = false;
-        break;
+    isNumber = n.length() > 0;
+    if (isNumber) {
+      int dotCount = 0;
+      for (auto c : n) {
+        if (!isDigit(c) && c != '.') {
+          isNumber = false;
+          break;
+        }
+        if (c == '.') {
+          ++dotCount;
+        }
       }
-      if (c == '.') {
-        ++dotCount;
-      }
+      isNumber = isNumber && dotCount <= 1;
     }
-    if (isNumber && dotCount > 1) {
-      isNumber = false;
-    }
-  } else {
-    isNumber = false;
   }
   return isNumber;
 };
@@ -81,11 +80,7 @@ auto Lexer::next() -> Token {
     throw std::runtime_error("Fetching tokens on an exhausted stream.");
   }
 
-  // skip all white characters
-  char thisChar = consumeChar();
-  while (isWhitespace(thisChar)) {
-    thisChar = consumeChar();
-  }
+  char thisChar = skipWhitespaceAndComments();
 
   int begin = position - 1;
   int end = begin;
@@ -113,9 +108,6 @@ auto Lexer::next() -> Token {
     case '"':
       token.type = Token::Type::String;
       end = readString();
-      break;
-    case ';':
-      // TODO: handle comment here
       break;
     default:
       // This should never happen
@@ -180,28 +172,8 @@ auto Lexer::matchChar(char c) const -> bool {
 }
 
 auto toString(const Token& token) -> std::string {
-  return std::format("type: {}\tlexeme: {}\tline: {}\tcolumn: {}",
+  return std::format("type: {}\tlexeme: {}\nline: {}\tcolumn: {}",
                      token.type, token.lexeme, token.line, token.column);
-}
-
-auto Lexer::readNumber(bool fract) -> int {
-  while (isDigit(peekChar())) {
-    consumeChar();
-  }
-
-  if (peekChar() == '.') {
-    if (fract) {
-      consumeChar();
-    } else {
-      throwError("Invalid syntax", line, column);
-    }
-  }
-
-  while (isDigit(peekChar())) {
-    consumeChar();
-  }
-
-  return position;
 }
 
 auto Lexer::readString() -> int {
@@ -243,4 +215,20 @@ auto Lexer::figureTokenType(std::string_view lexeme) -> Token::Type {
     type = Token::Type::Symbol;
   }
   return type;
+}
+
+auto Lexer::skipWhitespaceAndComments() -> char {
+  char c = consumeChar();
+  while (isWhitespace(c) || c == ';') {
+    if (isWhitespace(c)) {
+      do {
+        c = consumeChar();
+      } while (isWhitespace(c));
+    } else {
+      do {
+        c = consumeChar();
+      } while (c != '\n');
+    }
+  }
+  return c;
 }

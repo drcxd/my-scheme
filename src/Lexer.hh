@@ -23,14 +23,15 @@ class Lexer {
   auto peekNextChar() const -> char;
   auto consumeChar() -> char;
   auto matchChar(char c) const -> bool;
+
   // Consume a string
   auto readString() -> int;
+
+  auto skipWhitespaceAndComments() -> char;
+
   // Read to next delimiter
   auto readUntilNextDelimiter() -> int;
-  // try consume a number and return the end index of the token
-  auto readNumber(bool fract) -> int;
-  // try consume a symbol and return the end index of the token
-  auto readSymbol() -> int;
+
   auto figureTokenType(std::string_view lexeme) -> Token::Type;
 
 public:
