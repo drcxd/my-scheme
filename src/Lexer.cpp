@@ -130,7 +130,12 @@ auto Lexer::next() -> Token {
   return token;
 }
 
-// auto Lexer::peek() -> Token {}
+auto Lexer::peek() -> Token {
+  Lexer copy = *this;
+  Token token = next();
+  *this = copy;
+  return token;
+}
 
 auto Lexer::hasNext() const -> bool {
   return lastToken.type != Token::Type::End;
