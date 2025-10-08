@@ -49,3 +49,9 @@ the sequence of characters making up an identifier's name may start
 with digits, periods, plus signs, and minus signs as long as the
 sequence cannot be parsed as a number.
 #+end_quote
+
+* Tests
+
+How many tests should I have? How can I tell I have sufficiently
+covered most of the use cases? Should I develop a script to run all
+the tests and report if anything goes wrong?
